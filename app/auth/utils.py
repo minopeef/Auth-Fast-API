@@ -4,7 +4,6 @@ from datetime import datetime, timedelta, timezone
 from fastapi.responses import Response
 from app.config import settings
 
-
 def create_tokens(data: dict) -> dict:
     # Текущее время в UTC
     now = datetime.now(timezone.utc)
@@ -36,7 +35,6 @@ async def authenticate_user(user, password):
         return None
     return user
 
-
 def set_tokens(response: Response, user_id: int):
     new_tokens = create_tokens(data={"sub": str(user_id)})
     access_token = new_tokens.get('access_token')
@@ -58,13 +56,10 @@ def set_tokens(response: Response, user_id: int):
         samesite="lax"
     )
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)

@@ -3,11 +3,9 @@ from typing import Self
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator, computed_field
 from app.auth.utils import get_password_hash
 
-
 class EmailModel(BaseModel):
     email: EmailStr = Field(description="Электронная почта")
     model_config = ConfigDict(from_attributes=True)
-
 
 class UserBase(EmailModel):
     phone_number: str = Field(description="Номер телефона в международном формате, начинающийся с '+'")
@@ -20,7 +18,6 @@ class UserBase(EmailModel):
             raise ValueError('Номер телефона должен начинаться с "+" и содержать от 5 до 15 цифр')
         return value
 
-
 class SUserRegister(UserBase):
     password: str = Field(min_length=5, max_length=50, description="Пароль, от 5 до 50 знаков")
     confirm_password: str = Field(min_length=5, max_length=50, description="Повторите пароль")
@@ -32,20 +29,16 @@ class SUserRegister(UserBase):
         self.password = get_password_hash(self.password)  # хешируем пароль до сохранения в базе данных
         return self
 
-
 class SUserAddDB(UserBase):
     password: str = Field(min_length=5, description="Пароль в формате HASH-строки")
 
-
 class SUserAuth(EmailModel):
     password: str = Field(min_length=5, max_length=50, description="Пароль, от 5 до 50 знаков")
-
 
 class RoleModel(BaseModel):
     id: int = Field(description="Идентификатор роли")
     name: str = Field(description="Название роли")
     model_config = ConfigDict(from_attributes=True)
-
 
 class SUserInfo(UserBase):
     id: int = Field(description="Идентификатор пользователя")

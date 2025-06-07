@@ -12,7 +12,6 @@ from app.auth.schemas import SUserRegister, SUserAuth, EmailModel, SUserAddDB, S
 
 router = APIRouter()
 
-
 @router.post("/register/")
 async def register_user(user_data: SUserRegister,
                         session: AsyncSession = Depends(get_session_with_commit)) -> dict:
@@ -31,7 +30,6 @@ async def register_user(user_data: SUserRegister,
     await user_dao.add(values=SUserAddDB(**user_data_dict))
 
     return {'message': 'Вы успешно зарегистрированы!'}
-
 
 @router.post("/login/")
 async def auth_user(
@@ -52,7 +50,6 @@ async def auth_user(
         'message': 'Авторизация успешна!'
     }
 
-
 @router.post("/logout")
 async def logout(response: Response):
     response.delete_cookie("user_access_token")
@@ -70,7 +67,6 @@ async def get_all_users(session: AsyncSession = Depends(get_session_with_commit)
                         user_data: User = Depends(get_current_admin_user)
                         ) -> List[SUserInfo]:
     return await UsersDAO(session).find_all()
-
 
 @router.post("/refresh")
 async def process_refresh_token(
