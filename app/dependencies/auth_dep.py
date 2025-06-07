@@ -11,7 +11,6 @@ from app.exceptions import (
     TokenNoFound, NoJwtException, TokenExpiredException, NoUserIdException, ForbiddenException, UserNotFoundException
 )
 
-
 def get_access_token(request: Request) -> str:
     """Извлекаем access_token из кук."""
     token = request.cookies.get('user_access_token')
@@ -19,14 +18,12 @@ def get_access_token(request: Request) -> str:
         raise TokenNoFound
     return token
 
-
 def get_refresh_token(request: Request) -> str:
     """Извлекаем refresh_token из кук."""
     token = request.cookies.get('user_refresh_token')
     if not token:
         raise TokenNoFound
     return token
-
 
 async def check_refresh_token(
         token: str = Depends(get_refresh_token),
@@ -79,7 +76,6 @@ async def get_current_user(
     if not user:
         raise UserNotFoundException
     return user
-
 
 async def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
     """Проверяем права пользователя как администратора."""
