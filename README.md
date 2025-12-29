@@ -7,16 +7,16 @@ migration system simplifies working with the database schema.
 
 ## Key Features
 
-- ✅ **Authentication and Authorization** - Complete system for login, registration, and user management
-- ✅ **JWT Tokens** - Secure authorization using access and refresh tokens
-- ✅ **User Roles** - Support for regular users and administrators
-- ✅ **Async Database Operations** - Using SQLAlchemy 2.0 with async support
-- ✅ **Database Migrations** - Database schema management through Alembic
-- ✅ **Data Validation** - Pydantic schemas for input and output data validation
-- ✅ **Logging** - Integration with loguru for convenient logging
-- ✅ **CORS Support** - Configured CORS middleware for frontend integration
-- ✅ **Automatic Documentation** - Swagger UI and ReDoc out of the box
-- ✅ **Modular Architecture** - Clear separation into modules for easy extension
+- Authentication and Authorization - Complete system for login, registration, and user management
+- JWT Tokens - Secure authorization using access and refresh tokens
+- User Roles - Support for regular users and administrators
+- Async Database Operations - Using SQLAlchemy 2.0 with async support
+- Database Migrations - Database schema management through Alembic
+- Data Validation - Pydantic schemas for input and output data validation
+- Logging - Integration with loguru for convenient logging
+- CORS Support - Configured CORS middleware for frontend integration
+- Automatic Documentation - Swagger UI and ReDoc out of the box
+- Modular Architecture - Clear separation into modules for easy extension
 
 ## Technology Stack
 
@@ -204,7 +204,7 @@ Tokens are stored in HTTP-only cookies for enhanced security. The system support
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Yakvenalex/FastApiWithAuthSample.git .
+   git clone <repository-url> .
    ```
 
 2. Install dependencies:
@@ -218,12 +218,14 @@ Tokens are stored in HTTP-only cookies for enhanced security. The system support
    ```env
    SECRET_KEY=your-super-secret-key-here-change-in-production
    ALGORITHM=HS256
+   ENVIRONMENT=development
    ```
 
-   **Important**: 
-   - `SECRET_KEY` should be long and random for security (minimum 32 characters recommended)
-   - `ALGORITHM` defines the JWT token signing algorithm (usually HS256)
-   - SQLite database will be automatically created in the `data/` folder on first migration run
+   Important: 
+   - SECRET_KEY should be long and random for security (minimum 32 characters recommended)
+   - ALGORITHM defines the JWT token signing algorithm (usually HS256)
+   - ENVIRONMENT can be set to development or production
+   - SQLite database will be automatically created in the data/ folder on first migration run
 
 4. Apply database migrations (if not already applied):
 
@@ -240,9 +242,9 @@ Tokens are stored in HTTP-only cookies for enhanced security. The system support
    Replace the port if necessary.
 
 6. After startup, the application will be available at:
-   - **API**: http://localhost:8005
-   - **Interactive Documentation (Swagger UI)**: http://localhost:8005/docs
-   - **Alternative Documentation (ReDoc)**: http://localhost:8005/redoc
+   - API: http://localhost:8005
+   - Interactive Documentation (Swagger UI): http://localhost:8005/docs
+   - Alternative Documentation (ReDoc): http://localhost:8005/redoc
 
 ## Database Migrations
 
@@ -290,7 +292,7 @@ After starting the application, you can test the API in several ways:
 
 ### 1. Through Interactive Swagger UI Documentation
 
-Open in browser: http://localhost:8005/docs
+Open in browser at http://localhost:8005/docs
 
 Here you can:
 - View all available endpoints
@@ -299,7 +301,7 @@ Here you can:
 
 ### 2. Through ReDoc
 
-Open in browser: http://localhost:8005/redoc
+Open in browser at http://localhost:8005/redoc
 
 Alternative documentation with a more readable format.
 
@@ -339,8 +341,9 @@ The project uses the following environment variables (stored in `.env` file):
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
-| `SECRET_KEY` | Secret key for signing JWT tokens | Yes | `your-super-secret-key-here` |
-| `ALGORITHM` | JWT signing algorithm | Yes | `HS256` |
+| SECRET_KEY | Secret key for signing JWT tokens | Yes | your-super-secret-key-here |
+| ALGORITHM | JWT signing algorithm | No | HS256 |
+| ENVIRONMENT | Application environment | No | development |
 
 SQLite database is automatically created in the `data/db.sqlite3` folder on first migration run.
 
@@ -375,6 +378,4 @@ authorization, and structured architecture ready for scaling.
 
 ## Author
 
-**Yakovenko Alexey**  
-Telegram: [@PythonPathMaster](https://t.me/PythonPathMaster)  
-Community: [Easy Path to Python](https://t.me/PythonPathMaster)
+Yakovenko Alexey

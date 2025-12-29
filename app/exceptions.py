@@ -1,67 +1,56 @@
 from fastapi import status, HTTPException
 
-# Пользователь уже существует
 UserAlreadyExistsException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
-    detail='Пользователь уже существует'
+    detail='User already exists'
 )
 
-# Пользователь не найден
 UserNotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail='Пользователь не найден'
+    detail='User not found'
 )
 
-# Отсутствует идентификатор пользователя
 UserIdNotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail='Отсутствует идентификатор пользователя'
+    detail='User ID not found'
 )
 
-# Неверная почта или пароль
 IncorrectEmailOrPasswordException = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail='Неверная почта или пароль'
+    detail='Incorrect email or password'
 )
 
-# Токен истек
 TokenExpiredException = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Токен истек'
+    detail='Token expired'
 )
 
-# Некорректный формат токена
 InvalidTokenFormatException = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail='Некорректный формат токена'
+    detail='Invalid token format'
 )
 
-
-# Токен отсутствует в заголовке
 TokenNoFound = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,
-    detail='Токен отсутствует в заголовке'
+    detail='Token not found in cookies'
 )
 
-# Невалидный JWT токен
 NoJwtException = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Токен не валидный'
+    detail='Invalid token'
 )
 
-# Не найден ID пользователя
 NoUserIdException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
-    detail='Не найден ID пользователя'
+    detail='User ID not found in token'
 )
 
-# Недостаточно прав
 ForbiddenException = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
-    detail='Недостаточно прав'
+    detail='Insufficient permissions'
 )
 
 TokenInvalidFormatException = HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Неверный формат токена. Ожидается 'Bearer <токен>'"
+    status_code=status.HTTP_400_BAD_REQUEST,
+    detail="Invalid token format. Expected 'Bearer <token>'"
 )

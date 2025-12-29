@@ -5,11 +5,11 @@ from fastapi.responses import Response
 from app.config import settings
 
 def create_tokens(data: dict) -> dict:
-    # Текущее время в UTC
+    """Create access and refresh JWT tokens."""
     now = datetime.now(timezone.utc)
 
-    # AccessToken - 30 минут
-    access_expire = now + timedelta(seconds=10)
+    # AccessToken - 30 minutes
+    access_expire = now + timedelta(minutes=30)
     access_payload = data.copy()
     access_payload.update({"exp": int(access_expire.timestamp()), "type": "access"})
     access_token = jwt.encode(
@@ -18,7 +18,7 @@ def create_tokens(data: dict) -> dict:
         algorithm=settings.ALGORITHM
     )
 
-    # RefreshToken - 7 дней
+    # RefreshToken - 7 days
     refresh_expire = now + timedelta(days=7)
     refresh_payload = data.copy()
     refresh_payload.update({"exp": int(refresh_expire.timestamp()), "type": "refresh"})
@@ -35,25 +35,31 @@ async def authenticate_user(user, password):
         return None
     return user
 
-def set_tokens(response: Response, user_id: int):
+def set_tokens(response: Response, user_id: int) -> None:
+    """Set access and refresh tokens as HTTP-only cookies."""
     new_tokens = create_tokens(data={"sub": str(user_id)})
     access_token = new_tokens.get('access_token')
     refresh_token = new_tokens.get("refresh_token")
 
+    # Use secure=True only in production (HTTPS)
+    is_production = settings.ENVIRONMENT == "production"
+    
     response.set_cookie(
         key="user_access_token",
         value=access_token,
         httponly=True,
-        secure=True,
-        samesite="lax"
+        secure=is_production,
+        samesite="lax",
+        max_age=1800  # 30 minutes
     )
 
     response.set_cookie(
         key="user_refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=True,
-        samesite="lax"
+        secure=is_production,
+        samesite="lax",
+        max_age=604800  # 7 days
     )
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

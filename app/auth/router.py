@@ -15,21 +15,19 @@ router = APIRouter()
 @router.post("/register/")
 async def register_user(user_data: SUserRegister,
                         session: AsyncSession = Depends(get_session_with_commit)) -> dict:
-    # Проверка существования пользователя
+    """Register a new user."""
     user_dao = UsersDAO(session)
 
     existing_user = await user_dao.find_one_or_none(filters=EmailModel(email=user_data.email))
     if existing_user:
         raise UserAlreadyExistsException
 
-    # Подготовка данных для добавления
     user_data_dict = user_data.model_dump()
     user_data_dict.pop('confirm_password', None)
 
-    # Добавление пользователя
     await user_dao.add(values=SUserAddDB(**user_data_dict))
 
-    return {'message': 'Вы успешно зарегистрированы!'}
+    return {'message': 'User successfully registered!'}
 
 @router.post("/login/")
 async def auth_user(
@@ -37,6 +35,7 @@ async def auth_user(
         user_data: SUserAuth,
         session: AsyncSession = Depends(get_session_without_commit)
 ) -> dict:
+    """Authenticate user and set tokens."""
     users_dao = UsersDAO(session)
     user = await users_dao.find_one_or_none(
         filters=EmailModel(email=user_data.email)
@@ -47,14 +46,15 @@ async def auth_user(
     set_tokens(response, user.id)
     return {
         'ok': True,
-        'message': 'Авторизация успешна!'
+        'message': 'Authentication successful!'
     }
 
 @router.post("/logout")
 async def logout(response: Response):
+    """Logout user by removing tokens."""
     response.delete_cookie("user_access_token")
     response.delete_cookie("user_refresh_token")
-    return {'message': 'Пользователь успешно вышел из системы'}
+    return {'message': 'User successfully logged out'}
 
 
 @router.get("/me/")
@@ -73,5 +73,6 @@ async def process_refresh_token(
         response: Response,
         user: User = Depends(check_refresh_token)
 ):
+    """Refresh access and refresh tokens."""
     set_tokens(response, user.id)
-    return {"message": "Токены успешно обновлены"}
+    return {"message": "Tokens successfully refreshed"}
