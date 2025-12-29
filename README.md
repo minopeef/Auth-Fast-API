@@ -1,315 +1,311 @@
-# Шаблон приложения FastAPI с аутентификацией и авторизацией
+# FastAPI Application Template with Authentication and Authorization
 
-Этот проект представляет собой готовый шаблон для разработки масштабируемых веб-приложений на основе **FastAPI** с
-полноценной системой аутентификации и авторизации. Проект включает модульную архитектуру, поддерживает гибкое
-логирование с **loguru**, и взаимодействие с базой данных через **SQLAlchemy** с асинхронной поддержкой. Система
-миграций **Alembic** упрощает работу со схемой базы данных.
+This project is a ready-to-use template for developing scalable web applications based on **FastAPI** with
+a complete authentication and authorization system. The project includes a modular architecture, supports flexible
+logging with **loguru**, and database interaction through **SQLAlchemy** with async support. The **Alembic**
+migration system simplifies working with the database schema.
 
-## Основные возможности
+## Key Features
 
-- ✅ **Аутентификация и авторизация** - Полноценная система входа, регистрации и управления пользователями
-- ✅ **JWT токены** - Безопасная авторизация с использованием access и refresh токенов
-- ✅ **Роли пользователей** - Поддержка обычных пользователей и администраторов
-- ✅ **Асинхронная работа с БД** - Использование SQLAlchemy 2.0 с асинхронной поддержкой
-- ✅ **Миграции базы данных** - Управление схемой БД через Alembic
-- ✅ **Валидация данных** - Pydantic схемы для валидации входных и выходных данных
-- ✅ **Логирование** - Интеграция с loguru для удобного логирования
-- ✅ **CORS поддержка** - Настроенный CORS middleware для работы с фронтендом
-- ✅ **Автоматическая документация** - Swagger UI и ReDoc из коробки
-- ✅ **Модульная архитектура** - Четкое разделение на модули для легкого расширения
+- ✅ **Authentication and Authorization** - Complete system for login, registration, and user management
+- ✅ **JWT Tokens** - Secure authorization using access and refresh tokens
+- ✅ **User Roles** - Support for regular users and administrators
+- ✅ **Async Database Operations** - Using SQLAlchemy 2.0 with async support
+- ✅ **Database Migrations** - Database schema management through Alembic
+- ✅ **Data Validation** - Pydantic schemas for input and output data validation
+- ✅ **Logging** - Integration with loguru for convenient logging
+- ✅ **CORS Support** - Configured CORS middleware for frontend integration
+- ✅ **Automatic Documentation** - Swagger UI and ReDoc out of the box
+- ✅ **Modular Architecture** - Clear separation into modules for easy extension
 
-## Стек технологий
+## Technology Stack
 
-- **Веб-фреймворк**: FastAPI
-- **ORM**: SQLAlchemy с асинхронной поддержкой через aiosqlite
-- **База данных**: SQLite (легко заменяемая на другую SQL-СУБД)
-- **Система миграций**: Alembic
-- **Авторизация/Аутентификация**: bcrypt для хеширования паролей, python-jose для защиты данных с использованием JWT
+- **Web Framework**: FastAPI
+- **ORM**: SQLAlchemy with async support via aiosqlite
+- **Database**: SQLite (easily replaceable with another SQL database)
+- **Migration System**: Alembic
+- **Authorization/Authentication**: bcrypt for password hashing, python-jose for data protection using JWT
 
-## Зависимости проекта
+## Project Dependencies
 
-- `fastapi[all]==0.115.0` - высокопроизводительный веб-фреймворк
-- `pydantic==2.9.2` - валидация данных
-- `pydantic[email]` - поддержка валидации email адресов
-- `pydantic_settings==2.5.2` - управление настройками через переменные окружения
-- `uvicorn==0.31.0` - ASGI-сервер
-- `jinja2==3.1.4` - шаблонизатор
-- `SQLAlchemy==2.0.35` - ORM для работы с базами данных
-- `aiosqlite==0.20.0` - асинхронная поддержка SQLite
-- `alembic==1.13.3` - управление миграциями базы данных
-- `bcrypt==4.0.1` и `passlib[bcrypt]==1.7.4` - хеширование паролей
-- `python-jose==3.3.0` - работа с JWT токенами
-- `loguru==0.7.2` - красивое и удобное логирование
+- `fastapi[all]==0.115.0` - High-performance web framework
+- `pydantic==2.9.2` - Data validation
+- `pydantic[email]` - Email address validation support
+- `pydantic_settings==2.5.2` - Environment variable settings management
+- `uvicorn==0.31.0` - ASGI server
+- `jinja2==3.1.4` - Template engine
+- `SQLAlchemy==2.0.35` - ORM for database operations
+- `aiosqlite==0.20.0` - Async support for SQLite
+- `alembic==1.13.3` - Database migration management
+- `bcrypt==4.0.1` and `passlib[bcrypt]==1.7.4` - Password hashing
+- `python-jose==3.3.0` - JWT token operations
+- `loguru==0.7.2` - Beautiful and convenient logging
 
-## Структура проекта
+## Project Structure
 
-Проект построен с учётом модульной архитектуры, что позволяет легко расширять приложение и упрощает его поддержку.
-Каждый модуль отвечает за отдельные задачи, такие как авторизация или управление данными.
+The project is built with a modular architecture in mind, which allows easy application extension and simplifies maintenance.
+Each module is responsible for separate tasks, such as authorization or data management.
 
-### Основная структура проекта
+### Main Project Structure
 
 ```
 ├── app/
-│   ├── auth/                   # Модуль авторизации и аутентификации
-│   │   ├── dao.py              # Data Access Object для работы с БД
-│   │   ├── models.py           # Модели данных для авторизации
-│   │   ├── router.py           # Роутеры FastAPI для маршрутизации
-│   │   ├── schemas.py          # Схемы для валидации данных
-│   │   └── utils.py            # Вспомогательные функции для авторизации
-│   ├── dao/                    # Общие DAO для приложения
-│   │   ├── database.py         # Подключение к базе данных и управление сессиями
-│   │   └── base.py             # Базовый класс DAO для работы с БД
-│   ├── dependencies            # Зависимости в проекте
-│   │   ├── auth_dep.py         # Зависимости для авторизации
-│   │   └── dao_dep.py          # Зависимости для сессий SQLAlchemy
-│   ├── migration/              # Миграции базы данных
-│   │   ├── versions/           # Файлы миграций
-│   │   ├── env.py              # Настройки среды для Alembic
-│   │   ├── README              # Документация по миграциям
-│   │   └── script.py.mako      # Шаблон для генерации миграций
-│   ├── static/                 # Статические файлы приложения
-│   │   └── .gitkeep            # Пустой файл для сохранения папки в Git
-│   ├── config.py               # Конфигурация приложения
-│   ├── exceptions.py           # Исключения для обработки ошибок
-│   ├── main.py                 # Основной файл для запуска приложения
-├── data/                       # Папка для хранения файла БД
-│   └── db.sqlite3              # Файл базы данных SQLite
-├── .env                        # Конфигурация окружения
-├── alembic.ini                 # Конфигурация Alembic
-├── README.md                   # Документация проекта
-└── requirements.txt            # Зависимости проекта
+│   ├── auth/                   # Authentication and authorization module
+│   │   ├── dao.py              # Data Access Object for database operations
+│   │   ├── models.py           # Data models for authorization
+│   │   ├── router.py           # FastAPI routers for routing
+│   │   ├── schemas.py          # Schemas for data validation
+│   │   └── utils.py            # Helper functions for authorization
+│   ├── dao/                    # Common DAO for the application
+│   │   ├── database.py         # Database connection and session management
+│   │   └── base.py             # Base DAO class for database operations
+│   ├── dependencies            # Project dependencies
+│   │   ├── auth_dep.py         # Dependencies for authorization
+│   │   └── dao_dep.py          # Dependencies for SQLAlchemy sessions
+│   ├── migration/              # Database migrations
+│   │   ├── versions/           # Migration files
+│   │   ├── env.py              # Environment settings for Alembic
+│   │   ├── README              # Migration documentation
+│   │   └── script.py.mako      # Template for generating migrations
+│   ├── static/                 # Application static files
+│   │   └── .gitkeep            # Empty file to keep folder in Git
+│   ├── config.py               # Application configuration
+│   ├── exceptions.py           # Exception handling
+│   ├── main.py                 # Main file for running the application
+├── data/                       # Folder for database file storage
+│   └── db.sqlite3              # SQLite database file
+├── .env                        # Environment configuration
+├── alembic.ini                 # Alembic configuration
+├── README.md                   # Project documentation
+└── requirements.txt            # Project dependencies
 ```
 
-Обновленный раздел с подробным описанием основных модулей:
+### Main Modules
+
+#### **app/auth** - Authentication and Authorization Module
+
+The module is responsible for managing authentication (user login) and authorization (access verification) processes.  
+Main files:
+
+- **`dao.py`**: Data access object for users. Contains methods for database operations (create, update,
+  search users, etc.).
+- **`models.py`**: Defines ORM data models for users (e.g., Users table in the database).
+- **`router.py`**: Router for routing requests related to authentication. Defines endpoints for login,
+  registration, and access verification.
+- **`schemas.py`**: Defines Pydantic schemas for input data validation and response structures (e.g., data format
+  for user registration).
+- **`utils.py`**: Helper functions for working with tokens (create, verify JWT) and password encryption.
 
 ---
 
-### Основные модули
+#### **app/dao** - Base Data Access Layer
 
-#### **app/auth** - Модуль для аутентификации и авторизации
+The module contains abstractions for database operations. Used for managing connections and implementing
+CRUD operations.
 
-Модуль отвечает за управление процессами аутентификации (входа пользователей) и авторизации (проверки доступа).  
-Основные файлы:
-
-- **`dao.py`**: Объект доступа к данным пользователей. Содержит методы для работы с базой данных (создание, обновление,
-  поиск пользователей и т. д.).
-- **`models.py`**: Определяет ORM-модели данных для пользователей (например, таблица Users в базе данных).
-- **`router.py`**: Роутер для маршрутизации запросов, связанных с аутентификацией. Определяет эндпоинты для входа,
-  регистрации и проверки доступа.
-- **`schemas.py`**: Определяет Pydantic-схемы для валидации входных данных и структуры ответов (например, формат данных
-  для регистрации пользователей).
-- **`utils.py`**: Вспомогательные функции для работы с токенами (создание, проверка JWT) и шифрование паролей.
+- **`base.py`**: Base DAO class providing common methods for database operations, such as add,
+  update, delete, and search records.
+- **`database.py`**: Responsible for database connection, SQLAlchemy session management, and creating
+  async connections (e.g., via `aiosqlite`).
 
 ---
 
-#### **app/dao** - Базовый слой доступа к данным (Data Access Layer)
+#### **app/migration** - Database Migration Management with Alembic
 
-Модуль содержит абстракции для работы с базой данных. Используется для управления подключениями и реализации
-CRUD-операций.
+The module simplifies database schema management and allows safe changes.
 
-- **`base.py`**: Базовый класс DAO, предоставляющий общие методы для работы с базой данных, такие как добавление,
-  обновление, удаление и поиск записей.
-- **`database.py`**: Отвечает за подключение к базе данных, управление сессиями SQLAlchemy, а также создание
-  асинхронного подключения (например, через `aiosqlite`).
+- **`versions/`**: Stores migration files automatically created by Alembic.
+- **`env.py`**: Main configuration file for Alembic. Defines database connection and ORM interaction.
+- **`script.py.mako`**: Template for generating new migration files.
 
 ---
 
-#### **app/migration** - Управление миграциями базы данных с Alembic
+#### **app/dependencies** - Project Dependencies
 
-Модуль упрощает управление схемой базы данных и позволяет безопасно вносить изменения.
+The module contains dependencies used in the project.
 
-- **`versions/`**: Хранятся файлы миграций, автоматически создаваемые Alembic.
-- **`env.py`**: Основной файл конфигурации для Alembic. Определяет подключение к базе данных и взаимодействие с ORM.
-- **`script.py.mako`**: Шаблон для генерации новых файлов миграций.
-
----
-
-#### **app/dependencies** - Управление миграциями базы данных с Alembic
-
-Модуль содержит зависимости, которые используются в проекте.
-
-- **`auth_dep.py`**: Зависимости, связанные с авторизацией пользователя в системе
-- **`dao_dep.py`**: Зависимости, связанные с управллением сессией SQLAlchemy и с работой с дочерними классами BaseDao
+- **`auth_dep.py`**: Dependencies related to user authorization in the system
+- **`dao_dep.py`**: Dependencies related to SQLAlchemy session management and working with BaseDao child classes
 
 ---
 
-#### **config.py** - Настройки и конфигурация приложения
+#### **config.py** - Application Settings and Configuration
 
-- Определяет параметры приложения, загружаемые из файла `.env`. Например:
-    - `SECRET_KEY`: Секретный ключ для подписания JWT.
-    - `ALGORITHM`: Алгоритм хеширования токенов.
-    - `DATABASE_URL`: URL для подключения к базе данных.
-- Обеспечивает удобное управление конфигурацией для разных окружений (локальное, тестовое, продакшн).
+- Defines application parameters loaded from the `.env` file. For example:
+    - `SECRET_KEY`: Secret key for signing JWT.
+    - `ALGORITHM`: Token hashing algorithm.
+    - `DATABASE_URL`: URL for database connection.
+- Provides convenient configuration management for different environments (local, test, production).
 
 ---
 
-#### **main.py** - Основной файл для запуска приложения
+#### **main.py** - Main Application File
 
-- **Инициализация приложения**: Настраивает FastAPI-приложение, включая параметры, такие как название, версия, и
-  описание.
-- **Подключение роутеров**: Регистрирует маршруты, определённые в модулях приложения, например:
-    - `app.auth.router` для маршрутов авторизации.
-    - Любые дополнительные модули (например, `app.users.router`).
-- **Настройка зависимостей**: Внедряет глобальные зависимости, такие как подключение к базе данных или параметры
-  конфигурации.
-- **Настройка middleware**: Добавляет промежуточные слои для обработки запросов (например, CORS, сжатие, обработка
-  ошибок).
-- **Обработка ошибок**: Определяет глобальные обработчики исключений, чтобы возвращать понятные ответы при возникновении
-  ошибок (например, 401 Unauthorized или 500 Internal Server Error).
-- **Запуск сервера**: Используется для старта приложения с помощью ASGI-сервера (Uvicorn).
+- **Application Initialization**: Configures the FastAPI application, including parameters such as name, version, and
+  description.
+- **Router Registration**: Registers routes defined in application modules, for example:
+    - `app.auth.router` for authorization routes.
+    - Any additional modules (e.g., `app.users.router`).
+- **Dependency Configuration**: Injects global dependencies, such as database connection or configuration
+  parameters.
+- **Middleware Configuration**: Adds intermediate layers for request processing (e.g., CORS, compression, error
+  handling).
+- **Error Handling**: Defines global exception handlers to return clear responses when errors occur
+  (e.g., 401 Unauthorized or 500 Internal Server Error).
+- **Server Startup**: Used to start the application using an ASGI server (Uvicorn).
 
-## API Эндпоинты
+## API Endpoints
 
-### Аутентификация и авторизация (`/auth`)
+### Authentication and Authorization (`/auth`)
 
-- **POST `/auth/register/`** - Регистрация нового пользователя
-  - Принимает: email, password, confirm_password
-  - Возвращает: сообщение об успешной регистрации
+- **POST `/auth/register/`** - Register a new user
+  - Accepts: email, password, confirm_password
+  - Returns: success message
 
-- **POST `/auth/login/`** - Вход в систему
-  - Принимает: email, password
-  - Устанавливает cookies с access и refresh токенами
-  - Возвращает: сообщение об успешной авторизации
+- **POST `/auth/login/`** - Login to the system
+  - Accepts: email, password
+  - Sets cookies with access and refresh tokens
+  - Returns: success message
 
-- **POST `/auth/logout`** - Выход из системы
-  - Удаляет токены из cookies
-  - Возвращает: сообщение об успешном выходе
+- **POST `/auth/logout`** - Logout from the system
+  - Removes tokens from cookies
+  - Returns: success message
 
-- **GET `/auth/me/`** - Получение информации о текущем пользователе
-  - Требует: авторизацию (access token)
-  - Возвращает: информацию о пользователе
+- **GET `/auth/me/`** - Get current user information
+  - Requires: authorization (access token)
+  - Returns: user information
 
-- **GET `/auth/all_users/`** - Получение списка всех пользователей
-  - Требует: авторизацию с правами администратора
-  - Возвращает: список всех пользователей
+- **GET `/auth/all_users/`** - Get list of all users
+  - Requires: authorization with admin privileges
+  - Returns: list of all users
 
-- **POST `/auth/refresh`** - Обновление токенов доступа
-  - Требует: refresh token в cookie
-  - Устанавливает новые access и refresh токены
-  - Возвращает: сообщение об успешном обновлении
+- **POST `/auth/refresh`** - Refresh access tokens
+  - Requires: refresh token in cookie
+  - Sets new access and refresh tokens
+  - Returns: success message
 
-### Корневой эндпоинт
+### Root Endpoint
 
-- **GET `/`** - Главная страница
-  - Возвращает: приветственное сообщение и информацию о проекте
+- **GET `/`** - Home page
+  - Returns: welcome message and project information
 
-## Настройка аутентификации и авторизации
+## Authentication and Authorization Setup
 
-Для аутентификации используется JSON Web Token (JWT) с bcrypt для хеширования паролей и python-jose для генерации и
-проверки токенов. Это обеспечивает безопасное хранение данных и защищает API-эндпоинты.
+Authentication uses JSON Web Token (JWT) with bcrypt for password hashing and python-jose for token generation and
+verification. This ensures secure data storage and protects API endpoints.
 
-Токены хранятся в HTTP-only cookies для повышения безопасности. Система поддерживает:
-- Access токены для доступа к защищенным эндпоинтам
-- Refresh токены для обновления access токенов
-- Роли пользователей (обычный пользователь и администратор)
+Tokens are stored in HTTP-only cookies for enhanced security. The system supports:
+- Access tokens for accessing protected endpoints
+- Refresh tokens for refreshing access tokens
+- User roles (regular user and administrator)
 
-## Запуск приложения
+## Running the Application
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/Yakvenalex/FastApiWithAuthSample.git .
    ```
 
-2. Установите зависимости:
+2. Install dependencies:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Создайте и настройте `.env` файл в корне проекта:
+3. Create and configure `.env` file in the project root:
 
    ```env
    SECRET_KEY=your-super-secret-key-here-change-in-production
    ALGORITHM=HS256
    ```
 
-   **Важно**: 
-   - `SECRET_KEY` должен быть длинным и случайным для безопасности (рекомендуется минимум 32 символа)
-   - `ALGORITHM` определяет алгоритм подписи JWT токенов (обычно HS256)
-   - База данных SQLite будет автоматически создана в папке `data/` при первом запуске миграций
+   **Important**: 
+   - `SECRET_KEY` should be long and random for security (minimum 32 characters recommended)
+   - `ALGORITHM` defines the JWT token signing algorithm (usually HS256)
+   - SQLite database will be automatically created in the `data/` folder on first migration run
 
-4. Примените миграции базы данных (если они еще не применены):
+4. Apply database migrations (if not already applied):
 
    ```bash
    alembic upgrade head
    ```
 
-5. Запустите приложение с Uvicorn:
+5. Run the application with Uvicorn:
 
    ```bash
    uvicorn app.main:app --reload --port 8005
    ```
 
-   При необходимости замените port на нужный.
+   Replace the port if necessary.
 
-6. После запуска приложение будет доступно по адресу:
+6. After startup, the application will be available at:
    - **API**: http://localhost:8005
-   - **Интерактивная документация (Swagger UI)**: http://localhost:8005/docs
-   - **Альтернативная документация (ReDoc)**: http://localhost:8005/redoc
+   - **Interactive Documentation (Swagger UI)**: http://localhost:8005/docs
+   - **Alternative Documentation (ReDoc)**: http://localhost:8005/redoc
 
-## Миграции базы данных
+## Database Migrations
 
-Проект уже настроен с Alembic для управления миграциями базы данных.
+The project is already configured with Alembic for database migration management.
 
-### Применение существующих миграций
+### Applying Existing Migrations
 
 ```bash
 alembic upgrade head
 ```
 
-### Создание новой миграции
+### Creating a New Migration
 
-После изменения моделей в `app/auth/models.py` или других модулях:
+After changing models in `app/auth/models.py` or other modules:
 
 ```bash
-alembic revision --autogenerate -m "Описание изменений"
+alembic revision --autogenerate -m "Description of changes"
 ```
 
-### Откат миграций
+### Rolling Back Migrations
 
 ```bash
-# Откат на одну миграцию назад
+# Rollback one migration
 alembic downgrade -1
 
-# Откат всех миграций
+# Rollback all migrations
 alembic downgrade base
 ```
 
-### Просмотр истории миграций
+### Viewing Migration History
 
 ```bash
 alembic history
 ```
 
-### Просмотр текущей версии
+### Viewing Current Version
 
 ```bash
 alembic current
 ```
 
-## Тестирование API
+## API Testing
 
-После запуска приложения вы можете протестировать API несколькими способами:
+After starting the application, you can test the API in several ways:
 
-### 1. Через интерактивную документацию Swagger UI
+### 1. Through Interactive Swagger UI Documentation
 
-Откройте в браузере: http://localhost:8005/docs
+Open in browser: http://localhost:8005/docs
 
-Здесь вы можете:
-- Просмотреть все доступные эндпоинты
-- Протестировать API прямо в браузере
-- Увидеть схемы запросов и ответов
+Here you can:
+- View all available endpoints
+- Test the API directly in the browser
+- See request and response schemas
 
-### 2. Через ReDoc
+### 2. Through ReDoc
 
-Откройте в браузере: http://localhost:8005/redoc
+Open in browser: http://localhost:8005/redoc
 
-Альтернативная документация с более читаемым форматом.
+Alternative documentation with a more readable format.
 
-### 3. Через curl или Postman
+### 3. Through curl or Postman
 
-Пример регистрации пользователя:
+Example user registration:
 ```bash
 curl -X POST "http://localhost:8005/auth/register/" \
   -H "Content-Type: application/json" \
@@ -320,7 +316,7 @@ curl -X POST "http://localhost:8005/auth/register/" \
   }'
 ```
 
-Пример входа в систему:
+Example login:
 ```bash
 curl -X POST "http://localhost:8005/auth/login/" \
   -H "Content-Type: application/json" \
@@ -331,54 +327,54 @@ curl -X POST "http://localhost:8005/auth/login/" \
   -c cookies.txt
 ```
 
-Пример получения информации о текущем пользователе:
+Example getting current user information:
 ```bash
 curl -X GET "http://localhost:8005/auth/me/" \
   -b cookies.txt
 ```
 
-## Переменные окружения
+## Environment Variables
 
-Проект использует следующие переменные окружения (хранятся в `.env` файле):
+The project uses the following environment variables (stored in `.env` file):
 
-| Переменная | Описание | Обязательная | Пример |
-|------------|----------|--------------|--------|
-| `SECRET_KEY` | Секретный ключ для подписи JWT токенов | Да | `your-super-secret-key-here` |
-| `ALGORITHM` | Алгоритм подписи JWT | Да | `HS256` |
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `SECRET_KEY` | Secret key for signing JWT tokens | Yes | `your-super-secret-key-here` |
+| `ALGORITHM` | JWT signing algorithm | Yes | `HS256` |
 
-База данных SQLite создается автоматически в папке `data/db.sqlite3` при первом запуске миграций.
+SQLite database is automatically created in the `data/db.sqlite3` folder on first migration run.
 
-## Лучшие практики
+## Best Practices
 
-- Разделяйте функциональность приложения на модули для удобства тестирования и поддержки.
-- Обрабатывайте ошибки с четкими ответами и HTTP-кодами.
-- Проводите миграции с Alembic для управления схемой базы данных.
-- Используйте переменные окружения для безопасного хранения конфиденциальных данных.
-- Регулярно обновляйте зависимости для получения исправлений безопасности.
-- Используйте сильные пароли и длинные секретные ключи в продакшн окружении.
+- Separate application functionality into modules for easier testing and maintenance.
+- Handle errors with clear responses and HTTP codes.
+- Use Alembic migrations for database schema management.
+- Use environment variables for secure storage of sensitive data.
+- Regularly update dependencies to get security fixes.
+- Use strong passwords and long secret keys in production environment.
 
-## Разработка
+## Development
 
-### Добавление новых модулей
+### Adding New Modules
 
-1. Создайте новую папку в `app/` с вашим модулем
-2. Создайте необходимые файлы: `models.py`, `schemas.py`, `dao.py`, `router.py`
-3. Зарегистрируйте роутер в `app/main.py` в функции `register_routers()`
+1. Create a new folder in `app/` with your module
+2. Create necessary files: `models.py`, `schemas.py`, `dao.py`, `router.py`
+3. Register the router in `app/main.py` in the `register_routers()` function
 
-### Расширение функциональности
+### Extending Functionality
 
-Проект спроектирован с учетом расширяемости:
-- Добавьте новые модели в соответствующие модули
-- Создайте миграции для новых изменений схемы БД
-- Используйте существующие DAO классы как основу для новых
+The project is designed with extensibility in mind:
+- Add new models to corresponding modules
+- Create migrations for new database schema changes
+- Use existing DAO classes as a basis for new ones
 
 ---
 
-Этот шаблон является мощной и удобной основой для разработки приложений на FastAPI с поддержкой аутентификации,
-авторизации и структурированной архитектуры, готовой к масштабированию.
+This template is a powerful and convenient foundation for developing FastAPI applications with authentication,
+authorization, and structured architecture ready for scaling.
 
-## Автор
+## Author
 
-**Яковенко Алексей**  
+**Yakovenko Alexey**  
 Telegram: [@PythonPathMaster](https://t.me/PythonPathMaster)  
-Сообщество: [Легкий путь в Python](https://t.me/PythonPathMaster)
+Community: [Easy Path to Python](https://t.me/PythonPathMaster)
