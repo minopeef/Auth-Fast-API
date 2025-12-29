@@ -16,78 +16,78 @@ class BaseDAO(Generic[T]):
     def __init__(self, session: AsyncSession):
         self._session = session
         if self.model is None:
-            raise ValueError("Модель должна быть указана в дочернем классе")
+            raise ValueError("Model must be specified in child class")
 
     async def find_one_or_none_by_id(self, data_id: int):
         try:
             query = select(self.model).filter_by(id=data_id)
             result = await self._session.execute(query)
             record = result.scalar_one_or_none()
-            log_message = f"Запись {self.model.__name__} с ID {data_id} {'найдена' if record else 'не найдена'}."
+            log_message = f"{self.model.__name__} record with ID {data_id} {'found' if record else 'not found'}."
             logger.info(log_message)
             return record
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при поиске записи с ID {data_id}: {e}")
+            logger.error(f"Error searching for record with ID {data_id}: {e}")
             raise
 
     async def find_one_or_none(self, filters: BaseModel):
         filter_dict = filters.model_dump(exclude_unset=True)
-        logger.info(f"Поиск одной записи {self.model.__name__} по фильтрам: {filter_dict}")
+        logger.info(f"Searching for one {self.model.__name__} record with filters: {filter_dict}")
         try:
             query = select(self.model).filter_by(**filter_dict)
             result = await self._session.execute(query)
             record = result.scalar_one_or_none()
-            log_message = f"Запись {'найдена' if record else 'не найдена'} по фильтрам: {filter_dict}"
+            log_message = f"Record {'found' if record else 'not found'} with filters: {filter_dict}"
             logger.info(log_message)
             return record
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при поиске записи по фильтрам {filter_dict}: {e}")
+            logger.error(f"Error searching for record with filters {filter_dict}: {e}")
             raise
 
     async def find_all(self, filters: BaseModel | None = None):
         filter_dict = filters.model_dump(exclude_unset=True) if filters else {}
-        logger.info(f"Поиск всех записей {self.model.__name__} по фильтрам: {filter_dict}")
+        logger.info(f"Searching for all {self.model.__name__} records with filters: {filter_dict}")
         try:
             query = select(self.model).filter_by(**filter_dict)
             result = await self._session.execute(query)
             records = result.scalars().all()
-            logger.info(f"Найдено {len(records)} записей.")
+            logger.info(f"Found {len(records)} records.")
             return records
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при поиске всех записей по фильтрам {filter_dict}: {e}")
+            logger.error(f"Error searching for all records with filters {filter_dict}: {e}")
             raise
 
     async def add(self, values: BaseModel):
         values_dict = values.model_dump(exclude_unset=True)
-        logger.info(f"Добавление записи {self.model.__name__} с параметрами: {values_dict}")
+        logger.info(f"Adding {self.model.__name__} record with parameters: {values_dict}")
         try:
             new_instance = self.model(**values_dict)
             self._session.add(new_instance)
-            logger.info(f"Запись {self.model.__name__} успешно добавлена.")
+            logger.info(f"{self.model.__name__} record successfully added.")
             await self._session.flush()
             return new_instance
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при добавлении записи: {e}")
+            logger.error(f"Error adding record: {e}")
             raise
 
     async def add_many(self, instances: List[BaseModel]):
         values_list = [item.model_dump(exclude_unset=True) for item in instances]
-        logger.info(f"Добавление нескольких записей {self.model.__name__}. Количество: {len(values_list)}")
+        logger.info(f"Adding multiple {self.model.__name__} records. Count: {len(values_list)}")
         try:
             new_instances = [self.model(**values) for values in values_list]
             self._session.add_all(new_instances)
-            logger.info(f"Успешно добавлено {len(new_instances)} записей.")
+            logger.info(f"Successfully added {len(new_instances)} records.")
             await self._session.flush()
             return new_instances
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при добавлении нескольких записей: {e}")
+            logger.error(f"Error adding multiple records: {e}")
             raise
 
     async def update(self, filters: BaseModel, values: BaseModel):
         filter_dict = filters.model_dump(exclude_unset=True)
         values_dict = values.model_dump(exclude_unset=True)
         logger.info(
-            f"Обновление записей {self.model.__name__} по фильтру: {filter_dict} с параметрами: {values_dict}")
+            f"Updating {self.model.__name__} records with filter: {filter_dict} and values: {values_dict}")
         try:
             query = (
                 sqlalchemy_update(self.model)
@@ -96,44 +96,44 @@ class BaseDAO(Generic[T]):
                 .execution_options(synchronize_session="fetch")
             )
             result = await self._session.execute(query)
-            logger.info(f"Обновлено {result.rowcount} записей.")
+            logger.info(f"Updated {result.rowcount} records.")
             await self._session.flush()
             return result.rowcount
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при обновлении записей: {e}")
+            logger.error(f"Error updating records: {e}")
             raise
 
     async def delete(self, filters: BaseModel):
         filter_dict = filters.model_dump(exclude_unset=True)
-        logger.info(f"Удаление записей {self.model.__name__} по фильтру: {filter_dict}")
+        logger.info(f"Deleting {self.model.__name__} records with filter: {filter_dict}")
         if not filter_dict:
-            logger.error("Нужен хотя бы один фильтр для удаления.")
-            raise ValueError("Нужен хотя бы один фильтр для удаления.")
+            logger.error("At least one filter is required for deletion.")
+            raise ValueError("At least one filter is required for deletion.")
         try:
             query = sqlalchemy_delete(self.model).filter_by(**filter_dict)
             result = await self._session.execute(query)
-            logger.info(f"Удалено {result.rowcount} записей.")
+            logger.info(f"Deleted {result.rowcount} records.")
             await self._session.flush()
             return result.rowcount
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при удалении записей: {e}")
+            logger.error(f"Error deleting records: {e}")
             raise
 
     async def count(self, filters: BaseModel | None = None):
         filter_dict = filters.model_dump(exclude_unset=True) if filters else {}
-        logger.info(f"Подсчет количества записей {self.model.__name__} по фильтру: {filter_dict}")
+        logger.info(f"Counting {self.model.__name__} records with filter: {filter_dict}")
         try:
             query = select(func.count(self.model.id)).filter_by(**filter_dict)
             result = await self._session.execute(query)
             count = result.scalar()
-            logger.info(f"Найдено {count} записей.")
+            logger.info(f"Found {count} records.")
             return count
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при подсчете записей: {e}")
+            logger.error(f"Error counting records: {e}")
             raise
 
     async def bulk_update(self, records: List[BaseModel]):
-        logger.info(f"Массовое обновление записей {self.model.__name__}")
+        logger.info(f"Bulk updating {self.model.__name__} records")
         try:
             updated_count = 0
             for record in records:
@@ -150,9 +150,9 @@ class BaseDAO(Generic[T]):
                 result = await self._session.execute(stmt)
                 updated_count += result.rowcount
 
-            logger.info(f"Обновлено {updated_count} записей")
+            logger.info(f"Updated {updated_count} records")
             await self._session.flush()
             return updated_count
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при массовом обновлении: {e}")
+            logger.error(f"Error during bulk update: {e}")
             raise
